@@ -2,12 +2,26 @@ import { View, Button } from '@tarojs/components'
 import useConnection from 'utils/cpcl_bluetooth_print/hooks/useConnection'
 import styles from './styles.module.less'
 import useBluetoothPrint from "utils/cpcl_bluetooth_print/hooks/useBluetoothPrint";
+import SF from "utils/cpcl_bluetooth_print/template/shunfeng";
+// import { command as code } from 'utils/cpcl_bluetooth_print/template/demo1'
 
 function BluetoothPrinter() {
   const { devicesList, connectedDevice, start, connect, research } = useConnection()
-  const { print } = useBluetoothPrint()
+  const { print, queuePrint } = useBluetoothPrint()
 
-  const handlePrint = () => print(connectedDevice)
+  const handlePrint = () => {
+    const code = SF().getData()
+    console.log(code, '98999');
+    console.log('----------------')
+    console.log(code, 33522)
+    print(connectedDevice, code)
+  }
+
+  const batchPrint = () => {
+    const code = SF().getData()
+    const queue = [code, code]
+    queuePrint(connectedDevice, queue)
+  }
 
   return (
     <View className={styles.root}>
@@ -35,9 +49,17 @@ function BluetoothPrinter() {
                 <View styles={{ fontSize: '14px' }}>
                   <Button
                     className='print-button'
-                    onClick={(e) => handlePrint(printer, e)}
+                    onClick={handlePrint}
                   >
                     打印示例
+                  </Button>
+                </View>
+                <View styles={{ fontSize: '14px' }}>
+                  <Button
+                    className='print-button'
+                    onClick={batchPrint}
+                  >
+                    队列打印示例
                   </Button>
                 </View>
                 <View styles={{ fontSize: '14px' }}>
