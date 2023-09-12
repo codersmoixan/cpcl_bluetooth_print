@@ -6,7 +6,7 @@ import SF from "utils/cpcl_bluetooth_print/template/shunfeng";
 // import { command as code } from 'utils/cpcl_bluetooth_print/template/demo1'
 
 function BluetoothPrinter() {
-  const { devicesList, connectedDevice, start, connect, research } = useConnection()
+  const { devicesList, connectedDevice, start, connect, closeConnect, research } = useConnection()
   const { print, queuePrint } = useBluetoothPrint()
 
   const handlePrint = () => {
@@ -40,10 +40,15 @@ function BluetoothPrinter() {
       <View className={styles.printList}>
         {devicesList.map(printer => (
           <View className='device-row'>
-            <View key={printer.deviceId}>
+            <View key={printer.deviceId} style={{ width: '100%' }}>
               <View className='device-action'>
                 <View className='device-row__bd'>{printer.name || '未知设备'}</View>
-                {connectedDevice?.deviceId !== printer?.deviceId && <View onClick={() => connect(printer)} className='print-device__hd__desc'>连接</View>}
+                {connectedDevice?.deviceId !== printer?.deviceId
+                  ?
+                  <View onClick={() => connect(printer)} className='print-device__hd__desc'>连接</View>
+                  :
+                  <View onClick={() => closeConnect(printer?.deviceId)} className='print-device__hd__desc'>断开连接</View>
+                }
               </View>
               <View className='device-row__ft'>
                 <View styles={{ fontSize: '14px' }}>

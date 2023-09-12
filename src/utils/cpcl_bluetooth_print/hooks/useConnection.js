@@ -2,7 +2,7 @@ import Bluetooth from "../common/bluetooth";
 import {useState} from "react";
 import common, {filterPrint} from "../common/common";
 import Taro from "@tarojs/taro";
-import {createBLEConnection, getDeviceServices} from "../common/connection";
+import {closeBLEConnection, createBLEConnection, getDeviceServices} from "../common/connection";
 
 const bluetooth = new Bluetooth()
 
@@ -47,7 +47,6 @@ const useConnection = () => {
     try {
       await bluetooth.openBluetoothAdapter();
       setIsOpenBle(true)
-      common.showToast('蓝牙初始化成功');
     } catch (err) {
       state.isOpenBle = false
       if (err.errCode) {
@@ -63,15 +62,14 @@ const useConnection = () => {
   // 开启蓝牙搜索
   const start = async () => {
     try {
+      common.showLoading('蓝牙设备搜索中')
       if (!isOpenBle) {
         await openBluetoothAdapter()
       }
-      common.showLoading('蓝牙设备搜索中')
+
       await bluetooth.startBluetoothDevicesDiscovery();
       await getBluetoothDevices()
       common.hideLoading()
-      common.showToast('蓝牙设备搜索完成')
-      // setDevicesList([])
     } catch (err) {
       if (err.errCode) {
         common.showToast(bluetooth.bleerrcode(err.errCode));
@@ -87,17 +85,40 @@ const useConnection = () => {
   }
 
   const connect = async (printDevice) => {
+    if (printDevice.deviceId === connectedDevice?.deviceId) {
+      return
+    }
+
+    common.showLoading('蓝牙连接中')
+    if (connectedDevice && printDevice.deviceId !== connectedDevice.deviceId) {
+      await closeBLEConnection(connectedDevice.deviceId)
+    }
+
     await createBLEConnection(printDevice)
     const result = await getDeviceServices(printDevice.deviceId, 'write')
 
     setConnectedDevice(Object.assign(printDevice, result))
+    common.hideLoading()
     return Object.assign(printDevice, result)
+  }
+
+  const closeConnect = async () => {
+    if (!connectedDevice) {
+      return
+    }
+
+    await closeBLEConnection(connectedDevice?.deviceId)
+    setConnectedDevice(null)
+    common.showToast('已断开连接', {
+      icon: 'success'
+    })
   }
 
   return {
     start,
     connect,
     research,
+    closeConnect,
     devicesList,
     connectedDevice
   }
