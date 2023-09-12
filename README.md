@@ -31,3 +31,6 @@ https://github.com/codersmoixan/cpcl_bluetooth_print/blob/master/src/utils/cpcl_
 
 ###### 参考项目
 https://github.com/codersmoixan/uni_bluetooth_print
+
+###### CPCL编程参考手册（CPCL语言）
+https://www.docin.com/p-2160105026.html
