@@ -1,5 +1,5 @@
 import Taro from "@tarojs/taro";
-import base64 from './base64gb2312'
+import base64 from '../package/base64gb2312'
 
 const common = {
 	isShowLoading: false,
